@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html>
 <head>
     <title>Chatbot</title>
@@ -75,6 +75,187 @@
                         console.log(response);
                         $("#chatbot-response").append("<p><strong>You:</strong> " + $("#query").val() + "</p>");
                         $("#chatbot-response").append("<p><strong>Chatbot:</strong> " + response.response + "</p>");
+                        $("#query").val("");
+                    },
+                    error: function(xhr, status, error) {
+                        console.error(error);
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
+ -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chatbot</title>
+    <style>
+        #chatbot-container {
+            border: 1px solid black;
+            padding: 10px;
+            width: 500px;
+            margin: 0 auto;
+        }
+        
+        #chatbot-container h1 {
+            text-align: center;
+        }
+        
+        #chatbot-container form {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        #chatbot-container label {
+            margin-bottom: 10px;
+        }
+        
+        #chatbot-container input[type="text"] {
+            padding: 5px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            margin-bottom: 10px;
+        }
+        
+        #chatbot-container input[type="submit"] {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-bottom: 10px;
+        }
+        
+        #chatbot-container #chatbot-response {
+            border: 1px solid #ccc;
+            padding: 10px;
+            height: 100%;
+            overflow-y: auto;
+        }
+    </style>
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+    <div id="chatbot-container">
+        <h1>Chatbot</h1>
+        <form id="file-upload-form" enctype="multipart/form-data">
+            <input type="file" name="file" id="file">
+            <input type="button" value="Upload" onclick="uploadFile()">
+        </form>
+        <br>        
+        <br>   
+        <div id="uploaded-files"></div>
+     
+        <form id="chatbot-form">
+            <label for="query">Enter your query:</label>
+            <input type="text" name="query" id="query">
+            <input type="submit" value="Submit">
+        </form>
+        <div id="chatbot-response"></div>
+    </div>
+
+    
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/showdown@1.9.1/dist/showdown.min.js"></script>
+
+    <script>
+       
+       var converter = new showdown.Converter();
+
+        function uploadFile() {
+                        console.log("Test");
+            var fileInput = $("#file")[0];
+            var file = fileInput.files[0];
+            
+            var formData = new FormData();
+            formData.append('file', file);
+            
+                    $.ajax({
+                        url: "http://67.217.56.15:5000/file-upload",
+                        method: "POST",
+                        data: formData,
+                        contentType: false,
+                        processData: false,
+                        success: function(response) {
+                            console.log(response);
+                            alert('File uploaded successfully');
+                        },
+                        error: function(xhr, status, error) {
+                            console.error(error);
+                            alert('Error uploading file');
+                        }
+                    });
+            }
+
+        $(function() {
+
+            console.log("hello");
+
+            $.ajax({
+                url: 'http://67.217.56.15:5000/uploaded-files',
+                type: 'GET',
+                success: function(data) {
+                    data = JSON.parse(data);
+                    console.log(data);
+
+                    data.forEach(function(file) {
+                        console.log(file);
+                        var html = '<p>File name: ' + file + '</p>' +
+                                '<button class="delete-file" data-file="' + file + '">Delete</button>';
+                        $('#uploaded-files').append(html);
+                    });
+                },
+                error: function(xhr, status, error) {
+                    console.error(error);
+                }
+            });
+
+            // $.get('http://67.217.56.15:80/uploaded-files', function(data) {
+            //     console.log(data);
+            //     data.files.forEach(function(file) {
+            //         var html = '<p>File name: ' + file + '</p>' +
+            //                 // '<p>Upload date: ' + file.upload_date + '</p>' +
+            //                 '<button class="delete-file" data-file="' + file + '">Delete</button>';
+            //         $('#uploaded-files').append(html);
+            //     });
+            // });
+
+            // handle delete file button click
+            $(document).on('click', '.delete-file', function() {
+                var file = $(this).data('file');
+                $.ajax({
+                    url: 'http://67.217.56.15:5000/delete-file/' + file,
+                    method: 'DELETE',
+                    success: function(data) {
+                        alert('File deleted successfully');
+                        window.location.reload();
+                    },
+                    error: function(xhr, status, error) {
+                        console.error(error);
+                        alert('Error deleting file');
+                    }
+                });
+            });
+                    
+            $("#chatbot-form").on("submit", function(event) {
+                event.preventDefault();
+                
+                $.ajax({
+                    url: "http://67.217.56.15:5000/chatbot",
+                    method: "POST",
+                    data: $(this).serialize(),
+                    success: function(response) {
+                        console.log(response);
+                        response = converter.makeHtml(response);
+
+                        $("#chatbot-response").append("<p><strong>You:</strong> " + $("#query").val() + "</p>");
+                        $("#chatbot-response").append("<p><strong>Chatbot:</strong> " + response + "</p>");
                         $("#query").val("");
                     },
                     error: function(xhr, status, error) {
