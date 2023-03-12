@@ -177,7 +177,7 @@
             formData.append('file', file);
             
                     $.ajax({
-                        url: "http://67.217.56.15:5000/file-upload",
+                        url: "https://51d9-67-217-56-15.ngrok.io/file-upload",
                         method: "POST",
                         data: formData,
                         contentType: false,
@@ -198,7 +198,7 @@
             console.log("hello");
 
             $.ajax({
-                url: 'http://67.217.56.15:5000/uploaded-files',
+                url: 'https://51d9-67-217-56-15.ngrok.io/uploaded-files',
                 type: 'GET',
                 success: function(data) {
                     data = JSON.parse(data);
@@ -230,7 +230,7 @@
             $(document).on('click', '.delete-file', function() {
                 var file = $(this).data('file');
                 $.ajax({
-                    url: 'http://67.217.56.15:5000/delete-file/' + file,
+                    url: 'https://51d9-67-217-56-15.ngrok.io/delete-file/' + file,
                     method: 'DELETE',
                     success: function(data) {
                         alert('File deleted successfully');
@@ -247,7 +247,7 @@
                 event.preventDefault();
                 
                 $.ajax({
-                    url: "http://67.217.56.15:5000/chatbot",
+                    url: "https://51d9-67-217-56-15.ngrok.io/chatbot",
                     method: "POST",
                     data: $(this).serialize(),
                     success: function(response) {
